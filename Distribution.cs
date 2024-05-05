@@ -35,8 +35,8 @@ namespace lab3_mod
         /// <returns></returns>
         static public double ExpGenerator(double M)
         {
-            double A, Lambda = 1 / M, x = r.NextDouble();
-            A = 1 - Math.Pow(Math.E, -Lambda * x);
+            double A, x = r.NextDouble();
+            A = -M * Math.Log(x);
             return A;
         }
         /// <summary>

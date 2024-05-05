@@ -12,15 +12,15 @@ namespace lab3_mod
     {
         private int workCompletionTime = 0;  
         private int passedTime = 0; 
-        private int countOfclients = 0; 
+        private int countOfClients = 0; 
 
         // <summary>Количество клиентов, которые он обслуживает в данный момент</summary>
-        public int CountOfclients { 
+        public int CountOfClients { 
             get{ 
-                return countOfclients;
+                return countOfClients;
             } 
             set {
-                countOfclients = value < 0 ? throw new Exception("Значение количества меньше нуля") : value;
+                countOfClients = value < 0 ? throw new Exception("Значение количества меньше нуля") : value;
             } } 
 
         public StatusOfClerk Status { get; set; } = 0;
@@ -49,7 +49,7 @@ namespace lab3_mod
             {
                 Status = StatusOfClerk.waitClients;
                 passedTime = 0;
-                countOfclients = 0;
+                countOfClients = 0;
                 workCompletionTime = 0;
                 return true; 
             }
