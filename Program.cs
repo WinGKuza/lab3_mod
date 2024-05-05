@@ -10,7 +10,7 @@ namespace lab3_mod
     {
         static void Main(string[] args)
         {
-            Shop shop = new Shop(10000000); // Количество клерков, Шаг моделирования, Время моделирование
+            Shop shop = new Shop(1000000); // Количество клерков, Шаг моделирования, Время моделирование
 
             
         }

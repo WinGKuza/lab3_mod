@@ -32,6 +32,7 @@ namespace lab3_mod
             set { 
                 workCompletionTime = value < 0 ? throw new Exception("Значение времени меньше нуля") : value;
                 Status = StatusOfClerk.makeOrder;
+                passedTime = 0;
             }
         }
 
@@ -47,6 +48,7 @@ namespace lab3_mod
             passedTime += 1;
             if (Status != StatusOfClerk.waitClients && passedTime >= workCompletionTime && workCompletionTime != 0)
             {
+                
                 Status = StatusOfClerk.waitClients;
                 passedTime = 0;
                 countOfClients = 0;

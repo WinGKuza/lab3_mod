@@ -11,12 +11,12 @@ namespace lab3_mod
         Clerk[] clerks;
         private int countOfClients = 0; //Н - накопитель заявок
 
-        public Shop(int modelingTime = 100, int countClerk = 3, int step = 1)  // Количество клерков, Шаг моделирования, Время моделирование) 
+        public Shop(int modelingTime = 100, int countClerk = 2, int step = 1)  // Количество клерков, Шаг моделирования, Время моделирование) 
         {
             clerks = new Clerk[countClerk]; //К1, K2, K3 - каналы обслуживания - клерки
             for (int j = 0; j < clerks.Length; j++) clerks[j] = new Clerk(); // создание клерков
 
-            int timeArrivalNewClient = 0, timeArrivalLastClient = 0; //Время появления следующего клиента относительно прошлого, время появление прошлого клиента относительно нулевой точки времени
+            int timeArrivalNewClient = -1, timeArrivalLastClient = 0; //Время появления следующего клиента относительно прошлого, время появление прошлого клиента относительно нулевой точки времени
             int timeMakeOrder; //Время выполнения заказа
 
 
@@ -24,32 +24,28 @@ namespace lab3_mod
             int[] clerksRestTime = new int[countClerk]; //Время отдыха клерка
             List<int> clientsTimeInStore = new List<int>(); //Время каждого клиента проведенного в магазине
             int numberOfWarehouseExits = 0; //Количество выходов в склад клерками
+            int numberOfClients = 0;
 
             //Вспомогательные
             int numberOfLastClient = 0; //Номер последнего обслуженного клиента
 
 
-
-
-
-
             for (int t = 0; t < modelingTime; t += step)
             {
                 //Генерация времени появления клиента
-                if (timeArrivalNewClient == 0)
+                if (timeArrivalNewClient == -1)
                 {
                     timeArrivalNewClient = (int)Math.Round(Distribution.ExpGenerator(120)); //Генерация времени появления клиента
 
-                    while (timeArrivalNewClient == 1 || timeArrivalNewClient == 0) timeArrivalNewClient = (int)Math.Round(Distribution.ExpGenerator(120));
-                    Console.WriteLine("кусь {0}", timeArrivalNewClient);
+                    while (timeArrivalNewClient == 0) timeArrivalNewClient = (int)Math.Round(Distribution.ExpGenerator(120));
+ 
                 }
-                else if(timeArrivalNewClient + timeArrivalLastClient == t) {
+                if(timeArrivalNewClient + timeArrivalLastClient == t) {
                     timeArrivalLastClient += timeArrivalNewClient;
-                    timeArrivalNewClient = 0;
+                    timeArrivalNewClient = -1;
                     countOfClients++;
                     clientsTimeInStore.Add(0);
 
-                    Console.WriteLine("мяу {0}", t);
                 }
 
 
@@ -58,6 +54,7 @@ namespace lab3_mod
                 {
                     if (countOfClients != 0 && clerks[j].Status == StatusOfClerk.waitClients)
                     {
+
                         //Определяем кол-во клиентов которых обсуживает клерк
                         if (countOfClients >= 6)
                         {
@@ -70,6 +67,12 @@ namespace lab3_mod
                             countOfClients = 0;   
                         }
 
+                        Console.WriteLine(" {0}-ый клерк взял {1} заказов", j + 1, clerks[j].CountOfClients);
+                        numberOfClients += clerks[j].CountOfClients;
+                        numberOfWarehouseExits++;
+                        Console.WriteLine(" {0}/{1} заказов", numberOfClients, numberOfWarehouseExits);
+
+
                         //Расчёт времени нужное для обсуживания
                         timeMakeOrder = (int)Math.Round(Distribution.UniformGenerator(30, 90)); //Время хождения на склад 1 +- 0,5 мин
                         timeMakeOrder += (int)Math.Round(Distribution.NormalGenerator(clerks[j].CountOfClients * 0.2, clerks[j].CountOfClients * 3)); //Время поисков товаров
@@ -80,10 +83,10 @@ namespace lab3_mod
                             clientsTimeInStore[k] += timeMakeOrder;
                         }
                         clerks[j].WorkCompletionTime = timeMakeOrder;
-
+                        //Console.WriteLine("время исполнения заказа {0}",timeMakeOrder);
 
                         numberOfLastClient += clerks[j].CountOfClients;
-                        numberOfWarehouseExits ++; 
+                        
                     }
                     else if (clerks[j].Status == StatusOfClerk.waitClients)
                     {
@@ -91,30 +94,24 @@ namespace lab3_mod
                     }
 
                     clerks[j].Update();
+                    //Console.WriteLine("клерк {0} - статус {1}, время выполнения заказа{2}, сколько уже выполняет {3}", j, (int)clerks[j].Status, clerks[j].WorkCompletionTime, clerks[j].PassedTime);
                 }
 
                 //Считаем время клиентов, стоящих в очереди
                 for (int j = numberOfLastClient; j < clientsTimeInStore.Count; j++) clientsTimeInStore[j]++;
             }
 
+            
+
             Console.WriteLine("1. Загрузка клерков:");
             for (int j = 0; j < clerks.Length; j++)
             {
                 Console.WriteLine("  {0} - ый клерк работал {1}% от моделируемого времени ({2}/{3} сек)", j+1, (modelingTime - clerksRestTime[j]) * 100/ modelingTime, modelingTime - clerksRestTime[j], modelingTime);
             }
-
-            int m = 0;
             
-            Console.WriteLine("2. Время прибывания клиента в магазине:");
-            for (int j = 0; j < clientsTimeInStore.Count; j++)
-            {
-                //Console.WriteLine("  {0} - ый клиент пробыл в магазине {1} сек.", j + 1, clientsTimeInStore[j]);
-                m += clientsTimeInStore[j];
-            }
-
-            Console.WriteLine(clientsTimeInStore.Count);
-            Console.WriteLine(m);
-            Console.WriteLine("3. Среднее число заявок, которые удовлетворяются за один выход в склад: {0}", clientsTimeInStore.Count/ numberOfWarehouseExits);
+            Console.WriteLine("2. Среднее время прибывания клиента в магазине: {0}", clientsTimeInStore.Sum() / (double)clientsTimeInStore.Count);
+                       
+            Console.WriteLine("3. Среднее число заявок, которые удовлетворяются за один выход в склад: {0}", (double)numberOfClients / (double)numberOfWarehouseExits);
 
 
         }
