@@ -10,31 +10,7 @@ namespace lab3_mod
     internal class Distribution
     {
         static Random r = new Random();
-
-        /// <summary>
-        /// Генерация чисел с нормальным законом распределения и сортировка
-        /// </summary>
-        /// <param name="N">Количество чисел</param>
-        /// <param name="Sigma">Среднеквадратичное отклонение</param>
-        /// <param name="M">Математическое ожидание</param>
-        /// <returns></returns>
-        static public double[] NormalGenerator(int N, double Sigma, double M)
-        {
-            double[] A = new double[N];
-            double V = 0, z, n = 20;
-            for (int i = 0; i < N; i++)
-            {
-                for (int j = 1; j <= n; j++)
-                {
-                    V += r.NextDouble();
-                }
-                z = (V - n / 2) / Math.Sqrt(n / 12);
-                A[i] = z * Sigma + M;
-                V = 0;
-            }
-            Array.Sort(A);
-            return A;
-        }
+  
         /// <summary>
         /// Генерация числа с нормальным законом распределения
         /// </summary>
@@ -67,7 +43,7 @@ namespace lab3_mod
         /// Генерация числа с равномерным законом распределения
         /// </summary>
         /// <param name="delta">Смещение</param>
-        /// <returns>Случайное число в пределах [a + dev; b + dev]</returns>
-        static public double UniformGenerator(double delta = 0) => r.NextDouble() + delta;
+        /// <returns>Случайное число в пределах [delta; 1 + delta]</returns>
+        static public double UniformGenerator(double a, double b) => r.NextDouble() * (b - a) + a;
     }
 }
